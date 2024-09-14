@@ -26,21 +26,31 @@ function Apply() {
 
  const subbmit = async () => {
    const requestOptions = {
-       method: 'POST',
-       headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify({
-           "data": {
-               "Name": fullname,
-               "Email": email,
-               "Message": message,
-               "Portfolio_Link": link,
-               "Status": "Pending",
-               "JobID": jobid
-           }
-       })
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({
+    //         "data": {
+    //             "Name": fullname,
+    //             "Email": email,
+    //             "Message": message,
+    //             "Portfolio_Link": link,
+    //             "Status": "Pending",
+    //             "JobID": jobid
+    //         }
+    //     })
+        body: JSON.stringify({
+            data: {
+                Name: fullname,
+                Email: email,
+                Message: message,
+                Portfolio_Link: link,
+                Status: "Pending",
+                JobID: jobid
+            }
+       })    
    };
 
-   fetch('http://localhost:1337/api/applicantlists', requestOptions)
+   await fetch('http://localhost:1337/api/applicantlists', requestOptions)
        .then(response => response.json())
 
    alert("Application Submited Successful...");

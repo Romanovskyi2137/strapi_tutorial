@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
+    const navigate = useNavigate();
    const [state, setState] = useState("")
-   const [Applicant, setApplicants] = useState([]);
+   const [Applicants, setApplicants] = useState([]);
+   console.log(Applicants);
+   
    const [jobTitle, setjobTitle] = useState("")
    const [jobCategory, setjobCategory] = useState("")
    const [jobLocation, setjobLocation] = useState("")
@@ -12,36 +15,47 @@ export default function Dashboard() {
    const [jobExpreience, setjobExpreience] = useState("")
    const [openJob, setOpenJob] = useState([])
    const queryParams = new URLSearchParams(window.location.search);
-   const token = queryParams.get('token');
+   const token = queryParams.get('token');    
 
-   async function Applicants() {
-       await fetch("http://localhost:1337/api/applicantlists")
-           .then(res => res.json())
-           .then(list => {
-               setApplicants(list.data);
-           })
-
+   async function getApplicants() {
+    try {
+        await fetch("http://localhost:1337/api/applicantlists")
+        .then(res => res.json())
+        .then(list => {
+            setApplicants(list.data)
+        })
+    } catch (e) {
+        console.log(e);
+        
+    }
    }
 
    async function open() {
-       await fetch("http://localhost:1337/api/joblists")
-           .then(res => res.json())
-           .then(list => {
-               setOpenJob(list.data);
-           })
-
+    try {
+        await fetch("http://localhost:1337/api/joblists")
+        .then(res => res.json())
+        .then(list => {
+            setOpenJob(list.data)
+        })
+    } catch (e) {
+        console.log(e);
+        
+    }
    }
 
    const update = async (id) => {
-       const requestOptions = {
-           method: 'PUT',
-           headers: { 'Content-Type': 'application/json' },
-           body: '{"data":{"Status":"Approved"}}'
-       };
-       console.log(requestOptions)
-       await fetch('http://localhost:1337/api/applicantlists/' + id, requestOptions)
-           .then(response => response.json())
-           .then(data => this.setState("1"));
+        const requestOptions = {
+            method: 'PUT',
+            headers: { "Content-Type": 'application/json' },
+            body: {data:{Status: "Approved"}}
+        };
+        try {
+            await fetch('http://localhost:1337/api/applicantlists/' + id, requestOptions)
+            .then(response => response.json())
+            .then(data => setState("1"));
+        } catch (e) {
+            console.log(e);
+        }
 
 
    }
@@ -59,14 +73,14 @@ export default function Dashboard() {
    }
 
    useEffect(() => {
-       Applicants();
-       open();
+        const fn = async () => {
+            await getApplicants();
+            await open();
+        }
+        fn();
    }, [])
 
-   if (typeof (Applicant.id) === "undefinsed") {
-       const url = "/login";
-       return <Navigate to={url} />;
-   }
+   
 
 
    const addjob = async () => {
@@ -85,10 +99,9 @@ export default function Dashboard() {
                }
            })
        };
-       // console.log(requestOptions)
        fetch('http://localhost:1337/api/jobslists', requestOptions)
-           .then(response => response.json())
-       //  .then(data => this.setState(data ));
+        .then(response => response.json())
+        .then(data => this.setState(data));
 
        alert("Job Added Successful...");
    }
@@ -142,13 +155,13 @@ export default function Dashboard() {
                <br /><br />
 
                {
-                   Applicant.map((list, i) => {
+                   Applicants.map((list, i) => {
 
-                       if (list.attributes.Status == "Pending") {
+                       if (/* list.attributes.Status == "Pending" */true) {
                            return (
                                <div key={i}>
                                    <div>
-                                       <div className="detaills_">
+                                       <div className="details_">
                                            <div className="logo_"></div>
                                            <div className="description">
                                                <span className="span1_">{list.attributes.Name}</span>
